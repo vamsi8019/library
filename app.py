@@ -1,5 +1,7 @@
 from datetime import datetime
 import hashlib
+import importlib.util
+from pathlib import Path
 import uuid
 
 import matplotlib.pyplot as plt
@@ -13,14 +15,25 @@ try:
 except Exception:
     serial = None
 
-from rfid_library_management import (
-    TODAY,
-    detect_lost_books,
-    predict_due_date_violations,
-    prepare_availability_series,
-    train_availability_models,
-    train_demand_model,
-)
+
+def _load_rfid_library_module():
+    module_path = Path(__file__).with_name("rfid_library_management.py")
+    spec = importlib.util.spec_from_file_location("rfid_library_management_local", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load helper module from {module_path}")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_library = _load_rfid_library_module()
+TODAY = _library.TODAY
+detect_lost_books = _library.detect_lost_books
+predict_due_date_violations = _library.predict_due_date_violations
+prepare_availability_series = _library.prepare_availability_series
+train_availability_models = _library.train_availability_models
+train_demand_model = _library.train_demand_model
 
 
 st.set_page_config(
