@@ -1,14 +1,28 @@
+import importlib.util
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import streamlit as st
 
-from rfid_library_management import (
-    detect_lost_books,
-    generate_synthetic_transactions,
-    predict_due_date_violations,
-    prepare_availability_series,
-    train_availability_models,
-    train_demand_model,
-)
+
+def _load_rfid_library_module():
+    module_path = Path(__file__).with_name("rfid_library_management.py")
+    spec = importlib.util.spec_from_file_location("rfid_library_management_local", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load helper module from {module_path}")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_library = _load_rfid_library_module()
+detect_lost_books = _library.detect_lost_books
+generate_synthetic_transactions = _library.generate_synthetic_transactions
+predict_due_date_violations = _library.predict_due_date_violations
+prepare_availability_series = _library.prepare_availability_series
+train_availability_models = _library.train_availability_models
+train_demand_model = _library.train_demand_model
 
 
 st.set_page_config(page_title="RFID Library Management Dashboard", layout="wide")
