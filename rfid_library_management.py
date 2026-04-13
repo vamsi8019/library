@@ -1,5 +1,4 @@
 import uuid
-from dataclasses import dataclass
 from typing import Dict, Tuple
 import argparse
 
@@ -22,11 +21,11 @@ np.random.seed(RANDOM_SEED)
 TODAY = pd.Timestamp("2026-04-13")
 
 
-@dataclass
 class ModelMetrics:
-    name: str
-    mae: float
-    r2: float
+    def __init__(self, name: str, mae: float, r2: float):
+        self.name = name
+        self.mae = mae
+        self.r2 = r2
 
 
 def build_seed_rows() -> pd.DataFrame:
