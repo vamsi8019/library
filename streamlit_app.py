@@ -4,6 +4,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 
 
 def _load_rfid_library_module():
