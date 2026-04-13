@@ -31,9 +31,80 @@ st.set_page_config(
 )
 
 
-def apply_styles() -> None:
-    st.markdown(
+def apply_styles(theme_mode: str, sidebar_open: bool) -> None:
+    dark_theme_css = """
+        .stApp {
+            background:
+                radial-gradient(1200px 500px at 0% -10%, rgba(35, 171, 155, 0.16), transparent),
+                radial-gradient(900px 450px at 100% 0%, rgba(255, 152, 64, 0.14), transparent),
+                linear-gradient(180deg, #0b1118 0%, #0e1621 100%);
+            color: #dbe7f3;
+        }
+
+        .section-title,
+        .kpi-value,
+        .nav-caption,
+        .sidebar-card h3,
+        .hero-title {
+            color: #e7f3ff !important;
+        }
+
+        .section-subtitle,
+        .kpi-label,
+        .hero-sub {
+            color: #9ab1c5 !important;
+        }
+
+        .glass,
+        .panel,
+        .nav-shell,
+        .sidebar-card {
+            background: linear-gradient(145deg, rgba(18, 28, 40, 0.92), rgba(14, 22, 34, 0.9)) !important;
+            border-color: rgba(141, 181, 213, 0.2) !important;
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35) !important;
+        }
+
+        .metric-chip {
+            background: rgba(148, 200, 238, 0.15) !important;
+            color: #d2e7f8 !important;
+        }
+
+        .stButton > button {
+            background: linear-gradient(135deg, #172636, #1c3247) !important;
+            color: #e7f3ff !important;
+            border-color: rgba(141, 181, 213, 0.35) !important;
+        }
+
+        div[data-testid="stDataFrame"] {
+            border-color: rgba(141, 181, 213, 0.25) !important;
+        }
+    """
+
+    system_theme_css = f"@media (prefers-color-scheme: dark) {{{dark_theme_css}}}"
+    theme_overrides = ""
+    if theme_mode == "Dark":
+        theme_overrides = dark_theme_css
+    elif theme_mode == "System":
+        theme_overrides = system_theme_css
+
+    sidebar_rules = """
+        section[data-testid="stSidebar"] {
+            min-width: 22rem !important;
+            width: 22rem !important;
+        }
+    """
+    if not sidebar_open:
+        sidebar_rules += """
+        section[data-testid="stSidebar"] {
+            margin-left: -22.5rem !important;
+        }
+        section[data-testid="stSidebar"] > div {
+            visibility: hidden !important;
+        }
         """
+
+    st.markdown(
+        f"""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap');
 
@@ -60,24 +131,7 @@ def apply_styles() -> None:
             visibility: hidden !important;
         }
 
-        section[data-testid="stSidebar"] {
-            min-width: 22rem !important;
-            width: 22rem !important;
-        }
-
-        section[data-testid="stSidebar"][aria-expanded="true"] {
-            transform: translateX(0) !important;
-        }
-
-        section[data-testid="stSidebar"][aria-expanded="false"] {
-            transform: translateX(0) !important;
-            min-width: 22rem !important;
-            width: 22rem !important;
-        }
-
-        section[data-testid="stSidebar"][aria-expanded="false"] > div {
-            margin-left: 0 !important;
-        }
+        {sidebar_rules}
 
         @keyframes riseIn {
             from {
@@ -301,6 +355,7 @@ def apply_styles() -> None:
                 min-width: 100% !important;
                 width: 100% !important;
                 transform: translateX(0) !important;
+                margin-left: 0 !important;
             }
 
             section[data-testid="stSidebar"] > div {
@@ -325,6 +380,8 @@ def apply_styles() -> None:
                 width: 100%;
             }
         }
+
+        {theme_overrides}
         </style>
         """,
         unsafe_allow_html=True,
@@ -1020,8 +1077,20 @@ def live_simulation_tick() -> None:
 
 
 def main() -> None:
-    apply_styles()
+    if "theme_mode" not in st.session_state:
+        st.session_state.theme_mode = "System"
+    if "sidebar_open" not in st.session_state:
+        st.session_state.sidebar_open = True
+
+    apply_styles(st.session_state.theme_mode, st.session_state.sidebar_open)
     init_state()
+
+    c_ui, c_gap = st.columns([1, 5])
+    with c_ui:
+        toggle_label = "Hide Menu" if st.session_state.sidebar_open else "Open Menu"
+        if st.button(toggle_label):
+            st.session_state.sidebar_open = not st.session_state.sidebar_open
+            st.rerun()
 
     page_options = ["Dashboard", "RFID Operations", "Registry", "AI Insights"]
 
@@ -1036,6 +1105,15 @@ def main() -> None:
 
         st.markdown("---")
         st.subheader("System Controls")
+
+        theme_choice = st.selectbox(
+            "Theme",
+            ["System", "Light", "Dark"],
+            index=["System", "Light", "Dark"].index(st.session_state.theme_mode),
+        )
+        if theme_choice != st.session_state.theme_mode:
+            st.session_state.theme_mode = theme_choice
+            st.rerun()
 
         auto_mode = st.toggle("Real-time simulation", value=False)
         if auto_mode:
