@@ -209,7 +209,8 @@ def apply_styles(theme_mode: str) -> None:
         }
 
         .mobile-nav {
-            display: none;
+            display: block;
+            margin-bottom: 0.65rem;
         }
 
         .nav-caption {
@@ -316,11 +317,25 @@ def apply_styles(theme_mode: str) -> None:
             color: #0e2a38;
         }
 
-        @media (max-width: 900px) {
-            .mobile-nav {
-                display: block;
-                margin-bottom: 0.65rem;
+        @media (min-width: 901px) {
+            section[data-testid="stSidebar"] {
+                min-width: 21rem !important;
+                width: 21rem !important;
+                max-width: 21rem !important;
+                flex: 0 0 21rem !important;
             }
+
+            section[data-testid="stSidebar"] > div {
+                width: 21rem !important;
+                min-width: 21rem !important;
+            }
+
+            .mobile-nav {
+                max-width: 52rem;
+            }
+        }
+
+        @media (max-width: 900px) {
 
             .hero {
                 padding: 0.9rem 1rem;
@@ -980,6 +995,9 @@ def ai_page() -> None:
     )
     lost_books = detect_lost_books(model_df, overdue_threshold_days=14)
     due_predictions, due_acc = predict_due_date_violations(model_df)
+    st.session_state.ai_last_retrained_at = datetime.now().strftime("%H:%M:%S")
+
+    metric_chip(f"Model retrained at {st.session_state.ai_last_retrained_at}")
 
     metrics = pd.DataFrame(
         {
