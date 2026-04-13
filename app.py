@@ -103,8 +103,7 @@ def apply_styles(theme_mode: str, sidebar_open: bool) -> None:
         }
         """
 
-    st.markdown(
-        f"""
+    css_template = """
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap');
 
@@ -131,7 +130,7 @@ def apply_styles(theme_mode: str, sidebar_open: bool) -> None:
             visibility: hidden !important;
         }
 
-        {sidebar_rules}
+        __SIDEBAR_RULES__
 
         @keyframes riseIn {
             from {
@@ -381,9 +380,12 @@ def apply_styles(theme_mode: str, sidebar_open: bool) -> None:
             }
         }
 
-        {theme_overrides}
+        __THEME_OVERRIDES__
         </style>
-        """,
+        """
+
+    st.markdown(
+        css_template.replace("__SIDEBAR_RULES__", sidebar_rules).replace("__THEME_OVERRIDES__", theme_overrides),
         unsafe_allow_html=True,
     )
 
