@@ -27,7 +27,7 @@ st.set_page_config(
     page_title="RFID AI Smart Library",
     page_icon="RFID",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 
@@ -281,6 +281,7 @@ def apply_styles() -> None:
             section[data-testid="stSidebar"] {
                 min-width: 100% !important;
                 width: 100% !important;
+                transform: translateX(0) !important;
             }
 
             section[data-testid="stSidebar"] > div {
