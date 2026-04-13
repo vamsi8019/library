@@ -316,7 +316,7 @@ def apply_styles(theme_mode: str) -> None:
             color: #0e2a38;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .mobile-nav {
                 display: block;
                 margin-bottom: 0.65rem;
@@ -382,6 +382,11 @@ def apply_styles(theme_mode: str) -> None:
             .sidebar-card {
                 border-radius: 14px;
                 padding: 0.75rem;
+            }
+
+            .block-container {
+                padding-top: 0.8rem;
+                padding-bottom: 1.0rem;
             }
         }
 
@@ -1142,6 +1147,12 @@ def main() -> None:
         if auto_mode:
             seconds = st.slider("Refresh interval (seconds)", 5, 60, 15)
             st_autorefresh(interval=seconds * 1000, key="rfid_live_tick")
+            live_simulation_tick()
+
+        ai_live_mode = st.toggle("Live AI retraining", value=True)
+        if ai_live_mode and st.session_state.current_page == "AI Insights":
+            ai_seconds = st.slider("AI refresh interval (seconds)", 5, 60, 20)
+            st_autorefresh(interval=ai_seconds * 1000, key="rfid_ai_live_tick")
             live_simulation_tick()
 
         if st.button("Clear scan buffer"):
