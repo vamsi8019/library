@@ -30,6 +30,29 @@ train_demand_model = _library.train_demand_model
 st.set_page_config(page_title="RFID Library Management Dashboard", layout="wide")
 
 
+st.markdown(
+    """
+    <style>
+    header[data-testid="stHeader"],
+    div[data-testid="stToolbar"],
+    div[data-testid="stToolbarActions"],
+    div[data-testid="stSidebarHeader"],
+    button[data-testid="stMainMenuButton"],
+    button[data-testid="stBaseButton-header"],
+    button[data-testid="stBaseButton-headerNoPadding"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    .block-container {
+        padding-top: 1.1rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
 def run_pipeline(total_rows: int, overdue_threshold_days: int):
     transactions, book_df = generate_synthetic_transactions(total_rows=total_rows)
     demand_test, demand_metrics = train_demand_model(transactions)
