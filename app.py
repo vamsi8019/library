@@ -23,7 +23,12 @@ from rfid_library_management import (
 )
 
 
-st.set_page_config(page_title="RFID AI Smart Library", page_icon="RFID", layout="wide")
+st.set_page_config(
+    page_title="RFID AI Smart Library",
+    page_icon="RFID",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
 
 
 def apply_styles() -> None:
@@ -38,6 +43,11 @@ def apply_styles() -> None:
                 radial-gradient(1200px 500px at 0% -10%, rgba(18, 140, 126, 0.17), transparent),
                 radial-gradient(900px 450px at 100% 0%, rgba(242, 141, 51, 0.16), transparent),
                 linear-gradient(180deg, #f5f8f9 0%, #edf3f6 100%);
+        }
+
+        .block-container {
+            padding-top: 1.2rem;
+            padding-bottom: 1.6rem;
         }
 
         .hero {
@@ -69,6 +79,101 @@ def apply_styles() -> None:
             box-shadow: 0 10px 24px rgba(18, 36, 58, 0.08);
         }
 
+        .panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(20, 60, 90, 0.12);
+            border-radius: 18px;
+            padding: 1rem 1rem 0.9rem;
+            box-shadow: 0 12px 26px rgba(18, 36, 58, 0.08);
+            margin-top: 0.75rem;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0e2a38;
+            margin: 0 0 0.15rem 0;
+        }
+
+        .section-subtitle {
+            color: #577083;
+            font-size: 0.92rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+            margin: 0.55rem 0 0.15rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.28rem 0.68rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            color: #eef7fb;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        .metric-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(14, 42, 56, 0.05);
+            color: #274455;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .sidebar-card {
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid rgba(20, 60, 90, 0.12);
+            border-radius: 18px;
+            padding: 0.9rem;
+            box-shadow: 0 10px 20px rgba(18, 36, 58, 0.06);
+        }
+
+        .sidebar-card h3 {
+            margin: 0 0 0.6rem 0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+        }
+
+        .sidebar-card .stButton > button {
+            border-radius: 999px;
+        }
+
+        .stButton > button {
+            border-radius: 999px;
+            border: 1px solid rgba(20, 60, 90, 0.14);
+            background: linear-gradient(135deg, #ffffff, #eef6fa);
+            color: #153447;
+            box-shadow: 0 8px 18px rgba(18, 36, 58, 0.05);
+        }
+
+        .stButton > button:hover {
+            border-color: rgba(18, 140, 126, 0.45);
+            transform: translateY(-1px);
+        }
+
+        div[data-testid="stDataFrame"] {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(20, 60, 90, 0.12);
+            box-shadow: 0 10px 24px rgba(18, 36, 58, 0.06);
+        }
+
         .kpi-label {
             font-size: 0.85rem;
             color: #466173;
@@ -79,6 +184,58 @@ def apply_styles() -> None:
             font-size: 1.5rem;
             font-weight: 700;
             color: #0e2a38;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 0.9rem 1rem;
+                border-radius: 16px;
+            }
+
+            .hero-title {
+                font-size: 1.45rem;
+                line-height: 1.15;
+            }
+
+            .hero-sub {
+                font-size: 0.92rem;
+            }
+
+            .glass {
+                padding: 0.8rem 0.85rem;
+                border-radius: 14px;
+            }
+
+            .kpi-value {
+                font-size: 1.25rem;
+            }
+
+            section[data-testid="stSidebar"] {
+                min-width: 100% !important;
+                width: 100% !important;
+            }
+
+            section[data-testid="stSidebar"] > div {
+                width: 100% !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            div[data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+            }
+
+            .stButton > button,
+            .stTextInput input,
+            .stSelectbox div,
+            .stSlider,
+            .stMultiSelect div {
+                width: 100%;
+            }
         }
         </style>
         """,
@@ -446,6 +603,12 @@ def hero_header() -> None:
         <div class="hero">
             <div class="hero-title">RFID Based Smart Library Management System</div>
             <div class="hero-sub">AI powered operations using RFID-only scan flow for user and book management.</div>
+            <div class="badge-row">
+                <span class="badge">RFID-first workflow</span>
+                <span class="badge">AI analytics</span>
+                <span class="badge">Live updates</span>
+                <span class="badge">Responsive layout</span>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -464,10 +627,23 @@ def kpi_card(label: str, value: str) -> None:
     )
 
 
+def section_header(title: str, subtitle: str | None = None) -> None:
+    st.markdown(f'<div class="section-title">{title}</div>', unsafe_allow_html=True)
+    if subtitle:
+        st.markdown(f'<div class="section-subtitle">{subtitle}</div>', unsafe_allow_html=True)
+
+
+def metric_chip(text: str) -> None:
+    st.markdown(f'<div class="metric-chip">{text}</div>', unsafe_allow_html=True)
+
+
 def dashboard_page() -> None:
     loan_df = st.session_state.loan_df
     books_df = st.session_state.books_df
     users_df = st.session_state.users_df
+
+    section_header("Dashboard Overview", "At-a-glance activity, usage, and catalog health.")
+    metric_chip(f"Last sync: {datetime.now().strftime('%H:%M')}")
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -481,31 +657,35 @@ def dashboard_page() -> None:
         available_books = int((books_df["status"] == "available").sum())
         kpi_card("Available Books", f"{available_books:,}")
 
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
     col1, col2 = st.columns([1.7, 1])
     with col1:
         monthly = loan_df.set_index("borrow_date").resample("MS").size().reset_index(name="count")
         fig, ax = plt.subplots(figsize=(11, 4))
-        ax.plot(monthly["borrow_date"], monthly["count"], color="#0077b6", marker="o")
+        ax.plot(monthly["borrow_date"], monthly["count"], color="#0077b6", marker="o", linewidth=2.2)
+        ax.fill_between(monthly["borrow_date"], monthly["count"], color="#cbe9f6", alpha=0.6)
         ax.set_title("Borrow Trend")
         ax.set_xlabel("Month")
         ax.set_ylabel("Borrows")
         ax.tick_params(axis="x", rotation=30)
+        ax.grid(axis="y", alpha=0.18)
         st.pyplot(fig, width="stretch")
         plt.close(fig)
 
     with col2:
         by_role = loan_df.groupby("user_role").size().sort_values(ascending=False)
         fig, ax = plt.subplots(figsize=(6, 4))
-        ax.pie(by_role.values, labels=by_role.index, autopct="%1.1f%%", startangle=130)
+        ax.pie(by_role.values, labels=by_role.index, autopct="%1.1f%%", startangle=130, wedgeprops={"linewidth": 1, "edgecolor": "white"})
         ax.set_title("Borrow Mix by Role")
         st.pyplot(fig, width="stretch")
         plt.close(fig)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def rfid_ops_page() -> None:
-    st.subheader("RFID Scan Console")
-    st.caption("Operations are executed only by scanned RFID tags.")
+    section_header("RFID Scan Console", "Operations are executed only by scanned RFID tags.")
 
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
     c1, c2 = st.columns([2, 1])
     with c1:
         scan_input = st.text_input(
@@ -521,7 +701,9 @@ def rfid_ops_page() -> None:
         st.write(f"User RFID: {st.session_state.scanned_user_rfid or 'None'}")
         st.write(f"Book RFID: {st.session_state.scanned_book_rfid or 'None'}")
         st.write(f"Pending Raw UID: {st.session_state.pending_raw_uid or 'None'}")
+    st.markdown("</div>", unsafe_allow_html=True)
 
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
     raw1, raw2 = st.columns(2)
     with raw1:
         if st.button("Assign Pending UID as User"):
@@ -546,8 +728,9 @@ def rfid_ops_page() -> None:
     with a5:
         if st.button("Reserve"):
             st.info(reserve_by_scan())
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("### Recent RFID Scan Log")
+    section_header("Recent RFID Scan Log", "Most recent scan events and mappings.")
     if not st.session_state.scan_log:
         st.write("No scans yet.")
     else:
@@ -566,7 +749,7 @@ def rfid_ops_page() -> None:
 
 
 def registry_page() -> None:
-    st.subheader("RFID Registry")
+    section_header("RFID Registry", "Users, books, and recent loans live in one place.")
 
     users_df = st.session_state.users_df.copy()
     books_df = st.session_state.books_df.copy()
@@ -603,7 +786,7 @@ def registry_page() -> None:
 
 
 def ai_page() -> None:
-    st.subheader("AI Powered Insights")
+    section_header("AI Powered Insights", "Model quality, demand prediction, and exception detection.")
 
     loan_df = st.session_state.loan_df.copy()
     books_df = st.session_state.books_df.copy()
@@ -649,6 +832,7 @@ def ai_page() -> None:
         }
     )
 
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
     st.dataframe(metrics, width="stretch", hide_index=True)
     st.info(f"Due Date Violation Prediction Accuracy: {due_acc:.3f}")
 
@@ -689,8 +873,9 @@ def ai_page() -> None:
     fig.tight_layout()
     st.pyplot(fig, width="stretch")
     plt.close(fig)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("### Lost Book Detection")
+    section_header("Lost Book Detection", "Books flagged by overdue and missing-return heuristics.")
     if lost_books.empty:
         st.success("No lost books flagged.")
     else:
@@ -700,7 +885,7 @@ def ai_page() -> None:
             hide_index=True,
         )
 
-    st.markdown("### Due Date Violation Prediction")
+    section_header("Due Date Violation Prediction", "Active loans scored for late-return risk.")
     if due_predictions.empty:
         st.warning("No active borrows to score.")
     else:
@@ -736,6 +921,7 @@ def main() -> None:
     init_state()
 
     with st.sidebar:
+        st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
         st.header("Application Navigation")
         page = st.radio(
             "Select Screen",
@@ -773,6 +959,7 @@ def main() -> None:
                         log_scan(msg)
                 if serial_tags:
                     st.success(f"Captured {len(serial_tags)} tag(s) from {serial_port}")
+            st.markdown('</div>', unsafe_allow_html=True)
 
     hero_header()
 
