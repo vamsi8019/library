@@ -50,6 +50,17 @@ def apply_styles() -> None:
             padding-bottom: 1.6rem;
         }
 
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .hero {
             background: linear-gradient(135deg, #102a43 0%, #164e63 48%, #1f7a8c 100%);
             color: #f5fbff;
@@ -57,6 +68,7 @@ def apply_styles() -> None:
             padding: 1rem 1.2rem;
             box-shadow: 0 12px 26px rgba(10, 30, 60, 0.25);
             margin-bottom: 0.8rem;
+            animation: riseIn 0.55s ease both;
         }
 
         .hero-title {
@@ -77,6 +89,13 @@ def apply_styles() -> None:
             border-radius: 16px;
             padding: 0.9rem 1rem;
             box-shadow: 0 10px 24px rgba(18, 36, 58, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: riseIn 0.5s ease both;
+        }
+
+        .glass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(18, 36, 58, 0.11);
         }
 
         .panel {
@@ -86,6 +105,7 @@ def apply_styles() -> None:
             padding: 1rem 1rem 0.9rem;
             box-shadow: 0 12px 26px rgba(18, 36, 58, 0.08);
             margin-top: 0.75rem;
+            animation: riseIn 0.55s ease both;
         }
 
         .section-title {
@@ -148,6 +168,19 @@ def apply_styles() -> None:
             margin: 0 0 0.6rem 0;
             font-family: 'Space Grotesk', sans-serif;
             font-size: 1rem;
+        }
+
+        div[data-testid="stRadio"] label {
+            background: rgba(20, 60, 90, 0.04);
+            border: 1px solid rgba(20, 60, 90, 0.11);
+            border-radius: 999px;
+            padding: 0.25rem 0.5rem;
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+
+        div[data-testid="stRadio"] label:has(input:checked) {
+            border-color: rgba(18, 140, 126, 0.65);
+            background: rgba(18, 140, 126, 0.08);
         }
 
         .sidebar-card .stButton > button {
@@ -920,14 +953,22 @@ def main() -> None:
     apply_styles()
     init_state()
 
+    page_options = {
+        "Dashboard": "DASHBOARD  Activity Overview",
+        "RFID Operations": "OPERATIONS  Scan and Process",
+        "Registry": "REGISTRY  Users and Books",
+        "AI Insights": "AI INSIGHTS  Predictions and Risk",
+    }
+
     with st.sidebar:
         st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
         st.header("Application Navigation")
-        page = st.radio(
+        selected = st.radio(
             "Select Screen",
-            ["Dashboard", "RFID Operations", "Registry", "AI Insights"],
+            list(page_options.values()),
             index=0,
         )
+        page = next((k for k, v in page_options.items() if v == selected), "Dashboard")
 
         st.markdown("---")
         auto_mode = st.toggle("Real-time simulation", value=False)
