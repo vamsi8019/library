@@ -1,3 +1,4 @@
+from datetime import datetime
 import importlib.util
 from pathlib import Path
 
@@ -140,10 +141,21 @@ def main():
     st.title("RFID Library Management System")
     st.caption("Synthetic data + prediction models + single analytics dashboard")
 
+    if "pipeline_run_count" not in st.session_state:
+        st.session_state.pipeline_run_count = 0
+
     with st.sidebar:
         st.header("Controls")
         total_rows = st.slider("Number of transactions", min_value=1000, max_value=5000, value=1000, step=500)
         overdue_threshold_days = st.slider("Lost-book overdue threshold (days)", min_value=7, max_value=45, value=14)
+        live_refresh = st.toggle("Live AI refresh", value=True)
+        refresh_seconds = st.slider("Refresh interval (seconds)", min_value=5, max_value=60, value=15, step=5)
+
+    if live_refresh:
+        st_autorefresh(interval=refresh_seconds * 1000, key="rfid_live_refresh")
+
+    st.session_state.pipeline_run_count += 1
+    retrained_at = datetime.now().strftime("%H:%M:%S")
 
     (
         transactions,
@@ -156,12 +168,29 @@ def main():
         due_model_accuracy,
     ) = run_pipeline(total_rows=total_rows, overdue_threshold_days=overdue_threshold_days)
 
+    st.info(
+        f"AI Insights refreshed at {retrained_at}. Run #{st.session_state.pipeline_run_count}. "
+        "All charts and scores are retrained from the current synthetic transaction set on each refresh."
+    )
+
     m1, m2, m3, m4, m5 = st.columns(5)
     m1.metric("Demand MAE", f"{demand_metrics.mae:.3f}")
     m2.metric("Demand R²", f"{demand_metrics.r2:.3f}")
     m3.metric("Holt-Winters MAE", f"{availability_metrics['holt_winters'].mae:.3f}")
     m4.metric("Holt-Winters R²", f"{availability_metrics['holt_winters'].r2:.3f}")
     m5.metric("Due Violation Acc", f"{due_model_accuracy:.3f}")
+
+    st.subheader("AI Insights and Live Progress")
+    p1, p2, p3 = st.columns(3)
+    p1.metric("Refresh Runs", f"{st.session_state.pipeline_run_count}")
+    p2.metric("Active Loan Risks", f"{len(due_predictions)}")
+    p3.metric("Lost Book Flags", f"{len(lost_books)}")
+
+    with st.expander("Training snapshot", expanded=False):
+        st.write("Demand model: Linear Regression")
+        st.write("Availability models: Linear Regression, Holt-Winters, Decision Tree")
+        st.write("Due-date model: Logistic Regression")
+        st.write("Realtime mode: " + ("On" if live_refresh else "Off"))
 
     st.subheader("All Visualizations in One Dashboard")
     fig = render_dashboard(transactions, demand_test, availability_test, lost_books, due_predictions)
