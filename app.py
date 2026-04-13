@@ -1174,6 +1174,9 @@ def main() -> None:
             st_autorefresh(interval=ai_seconds * 1000, key="rfid_ai_live_tick")
             live_simulation_tick()
 
+        if st.session_state.get("ui_notice"):
+            st.success(st.session_state.ui_notice)
+
         if st.button("Clear scan buffer"):
             st.session_state.scanned_user_rfid = ""
             st.session_state.scanned_book_rfid = ""
@@ -1182,9 +1185,6 @@ def main() -> None:
             st.session_state.scan_log = []
             st.session_state.ui_notice = "RFID state cleared."
             st.toast("RFID state cleared.")
-
-        if st.session_state.get("ui_notice"):
-            st.info(st.session_state.ui_notice)
 
         st.markdown("---")
         st.subheader("RFID Reader Input")
