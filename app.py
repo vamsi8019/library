@@ -990,22 +990,18 @@ def main() -> None:
 
     page_options = ["Dashboard", "RFID Operations", "Registry", "AI Insights"]
 
-    st.markdown('<div class="nav-shell">', unsafe_allow_html=True)
-    st.markdown('<div class="nav-caption">Quick Navigation</div>', unsafe_allow_html=True)
-    page = st.radio(
-        "Navigate",
-        page_options,
-        index=0,
-        horizontal=True,
-        label_visibility="collapsed",
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
-
     with st.sidebar:
         st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
-        st.header("System Controls")
+        st.header("Application Navigation")
+        page = st.radio(
+            "Select Screen",
+            page_options,
+            index=0,
+        )
 
         st.markdown("---")
+        st.subheader("System Controls")
+
         auto_mode = st.toggle("Real-time simulation", value=False)
         if auto_mode:
             seconds = st.slider("Refresh interval (seconds)", 5, 60, 15)
@@ -1035,6 +1031,7 @@ def main() -> None:
                         log_scan(msg)
                 if serial_tags:
                     st.success(f"Captured {len(serial_tags)} tag(s) from {serial_port}")
+
             st.markdown('</div>', unsafe_allow_html=True)
 
     hero_header()
