@@ -1269,18 +1269,6 @@ def ai_page() -> None:
         }
 
         @media (max-width: 900px) {
-            section[data-testid="stSidebar"],
-            .stSidebar {
-                width: 0 !important;
-                min-width: 0 !important;
-                max-width: 0 !important;
-                overflow: hidden !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                position: absolute !important;
-                left: -100vw !important;
-            }
-
             .stAppViewContainer,
             .main,
             .block-container {
