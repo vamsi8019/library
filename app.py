@@ -104,6 +104,7 @@ def apply_styles(theme_mode: str) -> None:
             padding-bottom: 1.6rem;
         }
 
+        header,
         header[data-testid="stHeader"],
         div[data-testid="stToolbar"],
         div[data-testid="stDecoration"],
@@ -113,22 +114,31 @@ def apply_styles(theme_mode: str) -> None:
             display: none !important;
             visibility: hidden !important;
         }
-                section[data-testid="stSidebar"] {
-                    min-width: 21rem !important;
-                    width: 21rem !important;
-                    max-width: 21rem !important;
-                    flex: 0 0 21rem !important;
-                }
 
-                section[data-testid="stSidebar"] > div {
-                    width: 21rem !important;
-                    min-width: 21rem !important;
-                }
+        section[data-testid="stSidebar"] {
+            min-width: 20rem !important;
+            width: 20rem !important;
+        }
 
-                .mobile-nav {
-                    max-width: 52rem;
-                }
+        section[data-testid="stSidebar"][aria-expanded="true"] {
+            transform: translateX(0) !important;
+        }
+
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #102a43 0%, #164e63 48%, #1f7a8c 100%);
+            color: #f5fbff;
+            border-radius: 18px;
             padding: 1rem 1.2rem;
             box-shadow: 0 12px 26px rgba(10, 30, 60, 0.25);
             margin-bottom: 0.8rem;
@@ -310,17 +320,8 @@ def apply_styles(theme_mode: str) -> None:
 
         @media (min-width: 901px) {
             section[data-testid="stSidebar"] {
-                display: none !important;
-            }
-
-            section[data-testid="stSidebar"] {
                 min-width: 21rem !important;
-                .stSidebar {
-                    display: none !important;
-                }
                 width: 21rem !important;
-                padding-left: 0.85rem;
-                padding-right: 0.85rem;
                 max-width: 21rem !important;
                 flex: 0 0 21rem !important;
             }
@@ -336,7 +337,6 @@ def apply_styles(theme_mode: str) -> None:
         }
 
         @media (max-width: 900px) {
-
             .hero {
                 padding: 0.9rem 1rem;
                 border-radius: 16px;
