@@ -60,9 +60,13 @@ def apply_styles() -> None:
             visibility: hidden !important;
         }
 
-        button[data-testid="collapsedControl"] {
-            display: none !important;
-            visibility: hidden !important;
+        section[data-testid="stSidebar"] {
+            min-width: 22rem !important;
+            width: 22rem !important;
+        }
+
+        section[data-testid="stSidebar"][aria-expanded="true"] {
+            transform: translateX(0) !important;
         }
 
         section[data-testid="stSidebar"][aria-expanded="false"] {
