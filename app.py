@@ -1176,6 +1176,10 @@ def main() -> None:
         if st.button("Clear scan buffer"):
             st.session_state.scanned_user_rfid = ""
             st.session_state.scanned_book_rfid = ""
+            st.session_state.pending_raw_uid = ""
+            st.session_state.uid_map = {}
+            st.session_state.scan_log = []
+            st.success("RFID state cleared.")
 
         st.markdown("---")
         st.subheader("RFID Reader Input")
