@@ -113,31 +113,22 @@ def apply_styles(theme_mode: str) -> None:
             display: none !important;
             visibility: hidden !important;
         }
+                section[data-testid="stSidebar"] {
+                    min-width: 21rem !important;
+                    width: 21rem !important;
+                    max-width: 21rem !important;
+                    flex: 0 0 21rem !important;
+                }
 
-        section[data-testid="stSidebar"] {
-            min-width: 20rem !important;
-            width: 20rem !important;
-        }
+                section[data-testid="stSidebar"] > div {
+                    width: 21rem !important;
+                    min-width: 21rem !important;
+                }
 
-        section[data-testid="stSidebar"][aria-expanded="true"] {
-            transform: translateX(0) !important;
-        }
-
-        @keyframes riseIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+                .mobile-nav {
+                    max-width: 52rem;
+                }
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hero {
-            background: linear-gradient(135deg, #102a43 0%, #164e63 48%, #1f7a8c 100%);
-            color: #f5fbff;
-            border-radius: 18px;
             padding: 1rem 1.2rem;
             box-shadow: 0 12px 26px rgba(10, 30, 60, 0.25);
             margin-bottom: 0.8rem;
@@ -324,6 +315,9 @@ def apply_styles(theme_mode: str) -> None:
 
             section[data-testid="stSidebar"] {
                 min-width: 21rem !important;
+                .stSidebar {
+                    display: none !important;
+                }
                 width: 21rem !important;
                 padding-left: 0.85rem;
                 padding-right: 0.85rem;
@@ -1030,208 +1024,322 @@ def ai_page() -> None:
     )
 
     st.markdown('<div class="panel">', unsafe_allow_html=True)
-    st.dataframe(metrics, width="stretch", hide_index=True)
-    st.info(f"Due Date Violation Prediction Accuracy: {due_acc:.3f}")
+    css_template = """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap');
 
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+        .stApp {
+            font-family: 'Manrope', sans-serif;
+            background:
+                radial-gradient(1200px 500px at 0% -10%, rgba(18, 140, 126, 0.17), transparent),
+                radial-gradient(900px 450px at 100% 0%, rgba(242, 141, 51, 0.16), transparent),
+                linear-gradient(180deg, #f5f8f9 0%, #edf3f6 100%);
+        }
 
-    ax = axes[0, 0]
-    ax.plot(demand_test["borrow_date"], demand_test["actual_demand"], marker="o", label="Actual")
-    ax.plot(demand_test["borrow_date"], demand_test["predicted_demand"], marker="o", linestyle="--", label="Predicted")
-    ax.set_title("Book Demand Prediction")
-    ax.tick_params(axis="x", rotation=30)
-    ax.legend()
+        .block-container {
+            padding-top: 1.2rem;
+            padding-bottom: 1.6rem;
+        }
 
-    top_books = (
-        model_df.groupby("book_title")
-        .size()
-        .sort_values(ascending=False)
-        .head(10)
-        .sort_values(ascending=True)
-    )
-    ax = axes[0, 1]
-    ax.barh(top_books.index, top_books.values, color="#ff7f11")
-    ax.set_title("Most Popular Books")
+        header[data-testid="stHeader"],
+        div[data-testid="stToolbar"],
+        div[data-testid="stDecoration"],
+        div[data-testid="stStatusWidget"],
+        #MainMenu,
+        footer {
+            display: none !important;
+            visibility: hidden !important;
+        }
 
-    ax = axes[1, 0]
-    ax.plot(availability_test["date"], availability_test["available_books"], label="Actual", linewidth=2)
-    ax.plot(availability_test["date"], availability_test["pred_linear"], linestyle="--", label="Linear")
-    ax.plot(availability_test["date"], availability_test["pred_holt_winters"], linestyle="--", label="Holt-Winters")
-    ax.plot(availability_test["date"], availability_test["pred_tree"], linestyle="--", label="Tree")
-    ax.set_title("Availability Prediction Comparison")
-    ax.tick_params(axis="x", rotation=30)
-    ax.legend()
+        section[data-testid="stSidebar"] {
+            min-width: 20rem !important;
+            width: 20rem !important;
+        }
 
-    hourly = model_df.groupby("checkout_hour").size().reindex(range(8, 21), fill_value=0)
-    ax = axes[1, 1]
-    ax.plot(hourly.index, hourly.values, marker="o", color="#0081a7")
-    ax.set_title("Peak Usage Time")
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    fig.tight_layout()
-    st.pyplot(fig, width="stretch")
-    plt.close(fig)
-    st.markdown("</div>", unsafe_allow_html=True)
+        .hero {
+            background: linear-gradient(135deg, #102a43 0%, #164e63 48%, #1f7a8c 100%);
+            color: #f5fbff;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 12px 26px rgba(10, 30, 60, 0.25);
+            margin-bottom: 0.8rem;
+            animation: riseIn 0.55s ease both;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-    section_header("Lost Book Detection", "Books flagged by overdue and missing-return heuristics.")
-    if lost_books.empty:
-        st.success("No lost books flagged.")
-    else:
-        st.dataframe(
-            lost_books[["user_rfid", "book_rfid", "book_title", "borrow_date", "book_category"]].head(25),
-            width="stretch",
-            hide_index=True,
-        )
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.55rem, 2.8vw, 2.15rem);
+            font-weight: 700;
+            line-height: 1.18;
+            margin-bottom: 0.15rem;
+            overflow-wrap: anywhere;
+        }
 
-    section_header("Due Date Violation Prediction", "Active loans scored for late-return risk.")
-    if due_predictions.empty:
-        st.warning("No active borrows to score.")
-    else:
-        st.dataframe(
-            due_predictions[["user_rfid", "book_rfid", "book_title", "late_probability", "predicted_late"]].head(25),
-            width="stretch",
-            hide_index=True,
-        )
+        .hero-sub {
+            font-size: 1rem;
+            opacity: 0.93;
+        }
 
+        .glass {
+            background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(246,250,252,0.86));
+            border: 1px solid rgba(20, 60, 90, 0.12);
+            border-radius: 16px;
+            padding: 0.9rem 1rem;
+            box-shadow: 0 10px 24px rgba(18, 36, 58, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: riseIn 0.5s ease both;
+        }
 
-def live_simulation_tick() -> None:
-    if st.session_state.users_df.empty or st.session_state.books_df.empty:
-        return
+        .glass:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(18, 36, 58, 0.11);
+        }
 
-    users = st.session_state.users_df
-    books = st.session_state.books_df
+        .panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(20, 60, 90, 0.12);
+            border-radius: 18px;
+            padding: 1rem 1rem 0.9rem;
+            box-shadow: 0 12px 26px rgba(18, 36, 58, 0.08);
+            margin-top: 0.75rem;
+            animation: riseIn 0.55s ease both;
+        }
 
-    picked_user = users.sample(1).iloc[0]["user_rfid"]
-    available_books = books[books["status"] == "available"]
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0e2a38;
+            margin: 0 0 0.15rem 0;
+        }
 
-    if available_books.empty:
-        return
+        .section-subtitle {
+            color: #577083;
+            font-size: 0.92rem;
+            margin-bottom: 0.8rem;
+        }
 
-    picked_book = available_books.sample(1).iloc[0]["book_rfid"]
-    st.session_state.scanned_user_rfid = picked_user
-    st.session_state.scanned_book_rfid = picked_book
-    msg = checkout_by_scan()
-    log_scan(f"Auto simulated event: {msg}")
+        .nav-shell {
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(20, 60, 90, 0.11);
+            border-radius: 16px;
+            padding: 0.55rem 0.7rem 0.35rem;
+            box-shadow: 0 10px 24px rgba(18, 36, 58, 0.07);
+            margin-bottom: 0.65rem;
+        }
 
+        .mobile-nav {
+            display: block;
+            margin-bottom: 0.65rem;
+        }
 
-def main() -> None:
-    if "theme_mode" not in st.session_state:
-        st.session_state.theme_mode = "System"
-    if "current_page" not in st.session_state:
-        st.session_state.current_page = "Dashboard"
+        .nav-caption {
+            font-family: 'Space Grotesk', sans-serif;
+            color: #1d3e52;
+            font-size: 0.9rem;
+            margin: 0.1rem 0 0.45rem;
+        }
 
-    apply_styles(st.session_state.theme_mode)
-    init_state()
+        .badge-row {
+            display: flex;
+            gap: 0.45rem;
+            flex-wrap: wrap;
+            margin: 0.55rem 0 0.15rem;
+        }
 
-    page_options = ["Dashboard", "RFID Operations", "Registry", "AI Insights"]
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.28rem 0.68rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            color: #eef7fb;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
 
-    def sync_mobile_page() -> None:
-        st.session_state.current_page = st.session_state.mobile_page
+        .metric-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(14, 42, 56, 0.05);
+            color: #274455;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
 
-    def sync_sidebar_page() -> None:
-        st.session_state.current_page = st.session_state.side_page
+        .sidebar-card {
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid rgba(20, 60, 90, 0.12);
+            border-radius: 18px;
+            padding: 0.9rem;
+            box-shadow: 0 10px 20px rgba(18, 36, 58, 0.06);
+        }
 
-    current_index = page_options.index(st.session_state.current_page)
+        .sidebar-card h3 {
+            margin: 0 0 0.6rem 0;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+        }
 
-    st.markdown('<div class="mobile-nav nav-shell">', unsafe_allow_html=True)
-    st.markdown('<div class="nav-caption">Navigation (Mobile)</div>', unsafe_allow_html=True)
-    st.radio(
-        "Mobile Navigation",
-        page_options,
-        index=current_index,
-        horizontal=True,
-        label_visibility="collapsed",
-        key="mobile_page",
-        on_change=sync_mobile_page,
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
+        div[data-testid="stRadio"] label {
+            background: rgba(20, 60, 90, 0.04);
+            border: 1px solid rgba(20, 60, 90, 0.11);
+            border-radius: 999px;
+            padding: 0.25rem 0.5rem;
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
 
-    with st.sidebar:
-        st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
-        st.header("Application Navigation")
-        st.radio(
-            "Select Screen",
-            page_options,
-            index=current_index,
-            key="side_page",
-            on_change=sync_sidebar_page,
-        )
+        div[data-testid="stRadio"] label:has(input:checked) {
+            border-color: rgba(18, 140, 126, 0.65);
+            background: rgba(18, 140, 126, 0.08);
+        }
 
-        st.markdown("---")
-        st.subheader("System Controls")
+        .sidebar-card .stButton > button {
+            border-radius: 999px;
+        }
 
-        theme_choice = st.selectbox(
-            "Theme",
-            ["System", "Light", "Dark"],
-            index=["System", "Light", "Dark"].index(st.session_state.theme_mode),
-        )
-        if theme_choice != st.session_state.theme_mode:
-            st.session_state.theme_mode = theme_choice
-            st.rerun()
+        .stButton > button {
+            border-radius: 999px;
+            border: 1px solid rgba(20, 60, 90, 0.14);
+            background: linear-gradient(135deg, #ffffff, #eef6fa);
+            color: #153447;
+            box-shadow: 0 8px 18px rgba(18, 36, 58, 0.05);
+        }
 
-        auto_mode = st.toggle("Real-time simulation", value=False)
-        if auto_mode:
-            seconds = st.slider("Refresh interval (seconds)", 5, 60, 15)
-            st_autorefresh(interval=seconds * 1000, key="rfid_live_tick")
-            live_simulation_tick()
+        .stButton > button:hover {
+            border-color: rgba(18, 140, 126, 0.45);
+            transform: translateY(-1px);
+        }
 
-        ai_live_mode = st.toggle("Live AI retraining", value=True)
-        if ai_live_mode and st.session_state.current_page == "AI Insights":
-            ai_seconds = st.slider("AI refresh interval (seconds)", 5, 60, 20)
-            st_autorefresh(interval=ai_seconds * 1000, key="rfid_ai_live_tick")
-            live_simulation_tick()
+        div[data-testid="stDataFrame"] {
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(20, 60, 90, 0.12);
+            box-shadow: 0 10px 24px rgba(18, 36, 58, 0.06);
+        }
 
-        if st.session_state.get("ui_notice"):
-            st.success(st.session_state.ui_notice)
+        .kpi-label {
+            font-size: 0.85rem;
+            color: #466173;
+        }
 
-        if st.button("Clear scan buffer"):
-            st.session_state.scanned_user_rfid = ""
-            st.session_state.scanned_book_rfid = ""
-            st.session_state.pending_raw_uid = ""
-            st.session_state.uid_map = {}
-            st.session_state.scan_log = []
-            st.session_state.ui_notice = "RFID state cleared."
-            st.toast("RFID state cleared.")
+        .kpi-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0e2a38;
+        }
 
-        st.markdown("---")
-        st.subheader("RFID Reader Input")
-        serial_enabled = st.toggle("Enable Serial RFID Reader", value=False)
-        serial_port = st.text_input("Serial Port", value="COM3")
-        baud_rate = st.selectbox("Baud Rate", [9600, 19200, 38400, 57600, 115200], index=0)
-        auto_map_target = st.selectbox("Auto-map unknown raw UID as", ["Disabled", "USER", "BOOK"], index=0)
+        @media (min-width: 901px) {
+            section[data-testid="stSidebar"] {
+                min-width: 21rem !important;
+                width: 21rem !important;
+                max-width: 21rem !important;
+                flex: 0 0 21rem !important;
+            }
 
-        if serial_enabled:
-            if serial is None:
-                st.warning("pyserial not installed. Install requirements and restart app.")
-            else:
-                serial_tags = read_scans_from_serial(serial_port, baud_rate)
-                for tag in serial_tags:
-                    scan_tag(tag)
-                    if st.session_state.pending_raw_uid and auto_map_target in {"USER", "BOOK"}:
-                        msg = assign_pending_uid(auto_map_target)
-                        log_scan(msg)
-                if serial_tags:
-                    st.success(f"Captured {len(serial_tags)} tag(s) from {serial_port}")
+            section[data-testid="stSidebar"] > div {
+                width: 21rem !important;
+                min-width: 21rem !important;
+            }
 
-            st.markdown('</div>', unsafe_allow_html=True)
+            .mobile-nav {
+                max-width: 52rem;
+            }
+        }
 
-    page = st.session_state.current_page
+        @media (max-width: 900px) {
+            section[data-testid="stSidebar"],
+            .stSidebar {
+                display: none !important;
+            }
 
-    hero_header()
+            .stAppViewContainer,
+            .main,
+            .block-container {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
 
-    if st.session_state.get("ui_notice"):
-        st.info(st.session_state.ui_notice)
+            .block-container {
+                padding-top: 0.8rem;
+                padding-bottom: 1.0rem;
+                padding-left: 0.85rem;
+                padding-right: 0.85rem;
+            }
 
-    if page == "Dashboard":
-        dashboard_page()
-    elif page == "RFID Operations":
-        rfid_ops_page()
-    elif page == "Registry":
-        registry_page()
-    else:
-        ai_page()
+            .hero {
+                padding: 0.9rem 1rem;
+                border-radius: 16px;
+            }
 
-    st.caption(f"Last update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | System date anchor: {TODAY.date()}")
+            .nav-shell {
+                padding: 0.5rem 0.6rem 0.25rem;
+                border-radius: 14px;
+            }
 
+            .hero-title {
+                font-size: 1.35rem;
+                line-height: 1.15;
+            }
 
-if __name__ == "__main__":
-    main()
+            .hero-sub {
+                font-size: 0.92rem;
+            }
+
+            .glass {
+                padding: 0.8rem 0.85rem;
+                border-radius: 14px;
+            }
+
+            .kpi-value {
+                font-size: 1.25rem;
+            }
+
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            div[data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+            }
+
+            .stButton > button,
+            .stTextInput input,
+            .stSelectbox div,
+            .stSlider,
+            .stMultiSelect div {
+                width: 100%;
+            }
+
+            .sidebar-card {
+                border-radius: 14px;
+                padding: 0.75rem;
+            }
+        }
+
+        __THEME_OVERRIDES__
+        </style>
+        """
