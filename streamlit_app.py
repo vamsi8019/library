@@ -169,6 +169,10 @@ def main():
         st.session_state.pipeline_run_count = 0
 
     with st.sidebar:
+        st.header("Navigation")
+        page = st.radio("Select Screen", ["Dashboard", "AI Insights"], index=0, label_visibility="collapsed")
+
+        st.divider()
         st.header("Controls")
         total_rows = st.slider("Number of transactions", min_value=1000, max_value=5000, value=1000, step=500)
         overdue_threshold_days = st.slider("Lost-book overdue threshold (days)", min_value=7, max_value=45, value=14)
@@ -204,76 +208,84 @@ def main():
     m4.metric("Holt-Winters R²", f"{availability_metrics['holt_winters'].r2:.3f}")
     m5.metric("Due Violation Acc", f"{due_model_accuracy:.3f}")
 
-    st.subheader("AI Insights and Live Progress")
-    p1, p2, p3 = st.columns(3)
-    p1.metric("Refresh Runs", f"{st.session_state.pipeline_run_count}")
-    p2.metric("Active Loan Risks", f"{len(due_predictions)}")
-    p3.metric("Lost Book Flags", f"{len(lost_books)}")
+    if page == "Dashboard":
+        st.subheader("At-a-Glance Analytics")
+        d1, d2, d3 = st.columns(3)
+        d1.metric("Demand MAE", f"{demand_metrics.mae:.3f}")
+        d2.metric("Holt-Winters R²", f"{availability_metrics['holt_winters'].r2:.3f}")
+        d3.metric("Due Violation Acc", f"{due_model_accuracy:.3f}")
 
-    with st.expander("Training snapshot", expanded=False):
-        st.write("Demand model: Linear Regression")
-        st.write("Availability models: Linear Regression, Holt-Winters, Decision Tree")
-        st.write("Due-date model: Logistic Regression")
-        st.write("Realtime mode: " + ("On" if live_refresh else "Off"))
+        st.subheader("All Visualizations in One Dashboard")
+        fig = render_dashboard(transactions, demand_test, availability_test, lost_books, due_predictions)
+        st.pyplot(fig, use_container_width=True)
+        plt.close(fig)
 
-    st.subheader("All Visualizations in One Dashboard")
-    fig = render_dashboard(transactions, demand_test, availability_test, lost_books, due_predictions)
-    st.pyplot(fig, use_container_width=True)
-    plt.close(fig)
-
-    st.subheader("Model Metrics (MAE, R²)")
-    st.dataframe(
-        {
-            "Model": [
-                demand_metrics.name,
-                availability_metrics["linear"].name,
-                availability_metrics["holt_winters"].name,
-                availability_metrics["tree"].name,
-            ],
-            "MAE": [
-                demand_metrics.mae,
-                availability_metrics["linear"].mae,
-                availability_metrics["holt_winters"].mae,
-                availability_metrics["tree"].mae,
-            ],
-            "R2": [
-                demand_metrics.r2,
-                availability_metrics["linear"].r2,
-                availability_metrics["holt_winters"].r2,
-                availability_metrics["tree"].r2,
-            ],
-        },
-        use_container_width=True,
-        hide_index=True,
-    )
-
-    st.subheader("Lost Book Candidates")
-    if lost_books.empty:
-        st.info("No lost books detected with current threshold.")
-    else:
+        st.subheader("Model Metrics (MAE, R²)")
         st.dataframe(
-            lost_books[["user_id", "book_title", "borrow_date", "borrow_age", "book_category"]].head(20),
+            {
+                "Model": [
+                    demand_metrics.name,
+                    availability_metrics["linear"].name,
+                    availability_metrics["holt_winters"].name,
+                    availability_metrics["tree"].name,
+                ],
+                "MAE": [
+                    demand_metrics.mae,
+                    availability_metrics["linear"].mae,
+                    availability_metrics["holt_winters"].mae,
+                    availability_metrics["tree"].mae,
+                ],
+                "R2": [
+                    demand_metrics.r2,
+                    availability_metrics["linear"].r2,
+                    availability_metrics["holt_winters"].r2,
+                    availability_metrics["tree"].r2,
+                ],
+            },
             use_container_width=True,
             hide_index=True,
         )
 
-    st.subheader("Predicted Due-Date Violations (Active Borrows)")
-    if due_predictions.empty:
-        st.info("No active borrows available for due-date prediction.")
     else:
-        st.dataframe(
-            due_predictions[
-                [
-                    "user_id",
-                    "book_title",
-                    "borrow_date",
-                    "late_probability",
-                    "predicted_late",
-                ]
-            ].head(20),
-            use_container_width=True,
-            hide_index=True,
-        )
+        st.subheader("AI Insights and Live Progress")
+        p1, p2, p3 = st.columns(3)
+        p1.metric("Refresh Runs", f"{st.session_state.pipeline_run_count}")
+        p2.metric("Active Loan Risks", f"{len(due_predictions)}")
+        p3.metric("Lost Book Flags", f"{len(lost_books)}")
+
+        with st.expander("Training snapshot", expanded=True):
+            st.write("Demand model: Linear Regression")
+            st.write("Availability models: Linear Regression, Holt-Winters, Decision Tree")
+            st.write("Due-date model: Logistic Regression")
+            st.write("Realtime mode: " + ("On" if live_refresh else "Off"))
+
+        st.subheader("Predicted Due-Date Violations (Active Borrows)")
+        if due_predictions.empty:
+            st.info("No active borrows available for due-date prediction.")
+        else:
+            st.dataframe(
+                due_predictions[
+                    [
+                        "user_id",
+                        "book_title",
+                        "borrow_date",
+                        "late_probability",
+                        "predicted_late",
+                    ]
+                ].head(20),
+                use_container_width=True,
+                hide_index=True,
+            )
+
+        st.subheader("Lost Book Candidates")
+        if lost_books.empty:
+            st.info("No lost books detected with current threshold.")
+        else:
+            st.dataframe(
+                lost_books[["user_id", "book_title", "borrow_date", "borrow_age", "book_category"]].head(20),
+                use_container_width=True,
+                hide_index=True,
+            )
 
 
 if __name__ == "__main__":
