@@ -1181,6 +1181,10 @@ def main() -> None:
             st.session_state.uid_map = {}
             st.session_state.scan_log = []
             st.session_state.ui_notice = "RFID state cleared."
+            st.toast("RFID state cleared.")
+
+        if st.session_state.get("ui_notice"):
+            st.info(st.session_state.ui_notice)
 
         st.markdown("---")
         st.subheader("RFID Reader Input")
