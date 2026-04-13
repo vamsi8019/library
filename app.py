@@ -60,6 +60,21 @@ def apply_styles() -> None:
             visibility: hidden !important;
         }
 
+        button[data-testid="collapsedControl"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
+        section[data-testid="stSidebar"][aria-expanded="false"] {
+            transform: translateX(0) !important;
+            min-width: 22rem !important;
+            width: 22rem !important;
+        }
+
+        section[data-testid="stSidebar"][aria-expanded="false"] > div {
+            margin-left: 0 !important;
+        }
+
         @keyframes riseIn {
             from {
                 opacity: 0;
@@ -725,6 +740,21 @@ def dashboard_page() -> None:
     with c4:
         available_books = int((books_df["status"] == "available").sum())
         kpi_card("Available Books", f"{available_books:,}")
+
+    if len(loan_df) >= 30:
+        try:
+            model_df = loan_df.copy()
+            model_df["borrow_date"] = pd.to_datetime(model_df["borrow_date"], errors="coerce")
+            model_df["return_date"] = pd.to_datetime(model_df["return_date"], errors="coerce")
+            model_df = model_df.dropna(subset=["borrow_date"]).copy()
+            _, demand_metrics = train_demand_model(model_df)
+            _, due_acc = predict_due_date_violations(model_df)
+            st.info(
+                f"AI Snapshot: Demand R2 = {demand_metrics.r2:.3f} | Due-date Accuracy = {due_acc:.3f}. "
+                "Open 'AI Insights' from the left menu for full analytics."
+            )
+        except Exception:
+            st.info("AI Snapshot is preparing. Open 'AI Insights' from the left menu for full analytics.")
 
     st.markdown('<div class="panel">', unsafe_allow_html=True)
     col1, col2 = st.columns([1.7, 1])
