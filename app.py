@@ -990,13 +990,39 @@ def main() -> None:
 
     page_options = ["Dashboard", "RFID Operations", "Registry", "AI Insights"]
 
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = "Dashboard"
+
+    def on_top_nav_change() -> None:
+        st.session_state.current_page = st.session_state.top_nav
+
+    def on_side_nav_change() -> None:
+        st.session_state.current_page = st.session_state.side_nav
+
+    current_index = page_options.index(st.session_state.current_page)
+
+    st.markdown('<div class="nav-shell">', unsafe_allow_html=True)
+    st.markdown('<div class="nav-caption">Quick Navigation</div>', unsafe_allow_html=True)
+    st.radio(
+        "Navigate",
+        page_options,
+        index=current_index,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="top_nav",
+        on_change=on_top_nav_change,
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
     with st.sidebar:
         st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
         st.header("Application Navigation")
-        page = st.radio(
+        st.radio(
             "Select Screen",
             page_options,
-            index=0,
+            index=current_index,
+            key="side_nav",
+            on_change=on_side_nav_change,
         )
 
         st.markdown("---")
@@ -1033,6 +1059,8 @@ def main() -> None:
                     st.success(f"Captured {len(serial_tags)} tag(s) from {serial_port}")
 
             st.markdown('</div>', unsafe_allow_html=True)
+
+    page = st.session_state.current_page
 
     hero_header()
 
