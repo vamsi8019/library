@@ -1087,12 +1087,10 @@ def main() -> None:
     apply_styles(st.session_state.theme_mode, st.session_state.sidebar_open)
     init_state()
 
-    c_ui, c_gap = st.columns([1, 5])
-    with c_ui:
-        toggle_label = "Hide Menu" if st.session_state.sidebar_open else "Open Menu"
-        if st.button(toggle_label):
-            st.session_state.sidebar_open = not st.session_state.sidebar_open
-            st.rerun()
+    toggle_label = "Hide Menu" if st.session_state.sidebar_open else "Open Menu"
+    if st.button(toggle_label, key="menu_toggle_btn"):
+        st.session_state.sidebar_open = not st.session_state.sidebar_open
+        st.rerun()
 
     page_options = ["Dashboard", "RFID Operations", "Registry", "AI Insights"]
 
