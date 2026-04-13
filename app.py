@@ -518,6 +518,7 @@ def init_state() -> None:
     st.session_state.scanned_book_rfid = ""
     st.session_state.pending_raw_uid = ""
     st.session_state.uid_map = {}
+    st.session_state.ui_notice = ""
 
 
 def rebuild_catalogs_from_loans() -> None:
@@ -1179,7 +1180,7 @@ def main() -> None:
             st.session_state.pending_raw_uid = ""
             st.session_state.uid_map = {}
             st.session_state.scan_log = []
-            st.success("RFID state cleared.")
+            st.session_state.ui_notice = "RFID state cleared."
 
         st.markdown("---")
         st.subheader("RFID Reader Input")
@@ -1206,6 +1207,9 @@ def main() -> None:
     page = st.session_state.current_page
 
     hero_header()
+
+    if st.session_state.get("ui_notice"):
+        st.info(st.session_state.ui_notice)
 
     if page == "Dashboard":
         dashboard_page()
