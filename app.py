@@ -104,7 +104,6 @@ def apply_styles(theme_mode: str) -> None:
             padding-bottom: 1.6rem;
         }
 
-        header,
         header[data-testid="stHeader"],
         div[data-testid="stToolbar"],
         div[data-testid="stDecoration"],
