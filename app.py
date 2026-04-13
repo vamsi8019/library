@@ -50,6 +50,16 @@ def apply_styles() -> None:
             padding-bottom: 1.6rem;
         }
 
+        header[data-testid="stHeader"],
+        div[data-testid="stToolbar"],
+        div[data-testid="stDecoration"],
+        div[data-testid="stStatusWidget"],
+        #MainMenu,
+        footer {
+            display: none !important;
+            visibility: hidden !important;
+        }
+
         @keyframes riseIn {
             from {
                 opacity: 0;
@@ -69,13 +79,17 @@ def apply_styles() -> None:
             box-shadow: 0 12px 26px rgba(10, 30, 60, 0.25);
             margin-bottom: 0.8rem;
             animation: riseIn 0.55s ease both;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .hero-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
+            font-size: clamp(1.55rem, 2.8vw, 2.15rem);
             font-weight: 700;
+            line-height: 1.18;
             margin-bottom: 0.15rem;
+            overflow-wrap: anywhere;
         }
 
         .hero-sub {
@@ -120,6 +134,22 @@ def apply_styles() -> None:
             color: #577083;
             font-size: 0.92rem;
             margin-bottom: 0.8rem;
+        }
+
+        .nav-shell {
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(20, 60, 90, 0.11);
+            border-radius: 16px;
+            padding: 0.55rem 0.7rem 0.35rem;
+            box-shadow: 0 10px 24px rgba(18, 36, 58, 0.07);
+            margin-bottom: 0.65rem;
+        }
+
+        .nav-caption {
+            font-family: 'Space Grotesk', sans-serif;
+            color: #1d3e52;
+            font-size: 0.9rem;
+            margin: 0.1rem 0 0.45rem;
         }
 
         .badge-row {
@@ -225,8 +255,13 @@ def apply_styles() -> None:
                 border-radius: 16px;
             }
 
+            .nav-shell {
+                padding: 0.5rem 0.6rem 0.25rem;
+                border-radius: 14px;
+            }
+
             .hero-title {
-                font-size: 1.45rem;
+                font-size: 1.35rem;
                 line-height: 1.15;
             }
 
@@ -953,22 +988,22 @@ def main() -> None:
     apply_styles()
     init_state()
 
-    page_options = {
-        "Dashboard": "DASHBOARD  Activity Overview",
-        "RFID Operations": "OPERATIONS  Scan and Process",
-        "Registry": "REGISTRY  Users and Books",
-        "AI Insights": "AI INSIGHTS  Predictions and Risk",
-    }
+    page_options = ["Dashboard", "RFID Operations", "Registry", "AI Insights"]
+
+    st.markdown('<div class="nav-shell">', unsafe_allow_html=True)
+    st.markdown('<div class="nav-caption">Quick Navigation</div>', unsafe_allow_html=True)
+    page = st.radio(
+        "Navigate",
+        page_options,
+        index=0,
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
 
     with st.sidebar:
         st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
-        st.header("Application Navigation")
-        selected = st.radio(
-            "Select Screen",
-            list(page_options.values()),
-            index=0,
-        )
-        page = next((k for k, v in page_options.items() if v == selected), "Dashboard")
+        st.header("System Controls")
 
         st.markdown("---")
         auto_mode = st.toggle("Real-time simulation", value=False)
