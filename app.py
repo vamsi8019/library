@@ -208,6 +208,10 @@ def apply_styles(theme_mode: str) -> None:
             margin-bottom: 0.65rem;
         }
 
+        .mobile-nav {
+            display: none;
+        }
+
         .nav-caption {
             font-family: 'Space Grotesk', sans-serif;
             color: #1d3e52;
@@ -313,6 +317,11 @@ def apply_styles(theme_mode: str) -> None:
         }
 
         @media (max-width: 768px) {
+            .mobile-nav {
+                display: block;
+                margin-bottom: 0.65rem;
+            }
+
             .hero {
                 padding: 0.9rem 1rem;
                 border-radius: 16px;
@@ -368,6 +377,11 @@ def apply_styles(theme_mode: str) -> None:
             .stSlider,
             .stMultiSelect div {
                 width: 100%;
+            }
+
+            .sidebar-card {
+                border-radius: 14px;
+                padding: 0.75rem;
             }
         }
 
@@ -1072,19 +1086,44 @@ def live_simulation_tick() -> None:
 def main() -> None:
     if "theme_mode" not in st.session_state:
         st.session_state.theme_mode = "System"
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = "Dashboard"
 
     apply_styles(st.session_state.theme_mode)
     init_state()
 
     page_options = ["Dashboard", "RFID Operations", "Registry", "AI Insights"]
 
+    def sync_mobile_page() -> None:
+        st.session_state.current_page = st.session_state.mobile_page
+
+    def sync_sidebar_page() -> None:
+        st.session_state.current_page = st.session_state.side_page
+
+    current_index = page_options.index(st.session_state.current_page)
+
+    st.markdown('<div class="mobile-nav nav-shell">', unsafe_allow_html=True)
+    st.markdown('<div class="nav-caption">Navigation (Mobile)</div>', unsafe_allow_html=True)
+    st.radio(
+        "Mobile Navigation",
+        page_options,
+        index=current_index,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="mobile_page",
+        on_change=sync_mobile_page,
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
     with st.sidebar:
         st.markdown('<div class="sidebar-card">', unsafe_allow_html=True)
         st.header("Application Navigation")
-        page = st.radio(
+        st.radio(
             "Select Screen",
             page_options,
-            index=0,
+            index=current_index,
+            key="side_page",
+            on_change=sync_sidebar_page,
         )
 
         st.markdown("---")
@@ -1130,6 +1169,8 @@ def main() -> None:
                     st.success(f"Captured {len(serial_tags)} tag(s) from {serial_port}")
 
             st.markdown('</div>', unsafe_allow_html=True)
+
+    page = st.session_state.current_page
 
     hero_header()
 
