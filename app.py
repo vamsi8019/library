@@ -31,7 +31,7 @@ st.set_page_config(
 )
 
 
-def apply_styles(theme_mode: str, sidebar_open: bool) -> None:
+def apply_styles(theme_mode: str) -> None:
     dark_theme_css = """
         .stApp {
             background:
@@ -87,22 +87,6 @@ def apply_styles(theme_mode: str, sidebar_open: bool) -> None:
     elif theme_mode == "System":
         theme_overrides = system_theme_css
 
-    sidebar_rules = """
-        section[data-testid="stSidebar"] {
-            min-width: 22rem !important;
-            width: 22rem !important;
-        }
-    """
-    if not sidebar_open:
-        sidebar_rules += """
-        section[data-testid="stSidebar"] {
-            margin-left: -22.5rem !important;
-        }
-        section[data-testid="stSidebar"] > div {
-            visibility: hidden !important;
-        }
-        """
-
     css_template = """
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Manrope:wght@400;500;600&display=swap');
@@ -130,7 +114,14 @@ def apply_styles(theme_mode: str, sidebar_open: bool) -> None:
             visibility: hidden !important;
         }
 
-        __SIDEBAR_RULES__
+        section[data-testid="stSidebar"] {
+            min-width: 20rem !important;
+            width: 20rem !important;
+        }
+
+        section[data-testid="stSidebar"][aria-expanded="true"] {
+            transform: translateX(0) !important;
+        }
 
         @keyframes riseIn {
             from {
@@ -385,7 +376,7 @@ def apply_styles(theme_mode: str, sidebar_open: bool) -> None:
         """
 
     st.markdown(
-        css_template.replace("__SIDEBAR_RULES__", sidebar_rules).replace("__THEME_OVERRIDES__", theme_overrides),
+        css_template.replace("__THEME_OVERRIDES__", theme_overrides),
         unsafe_allow_html=True,
     )
 
@@ -1081,16 +1072,9 @@ def live_simulation_tick() -> None:
 def main() -> None:
     if "theme_mode" not in st.session_state:
         st.session_state.theme_mode = "System"
-    if "sidebar_open" not in st.session_state:
-        st.session_state.sidebar_open = True
 
-    apply_styles(st.session_state.theme_mode, st.session_state.sidebar_open)
+    apply_styles(st.session_state.theme_mode)
     init_state()
-
-    toggle_label = "Hide Menu" if st.session_state.sidebar_open else "Open Menu"
-    if st.button(toggle_label, key="menu_toggle_btn"):
-        st.session_state.sidebar_open = not st.session_state.sidebar_open
-        st.rerun()
 
     page_options = ["Dashboard", "RFID Operations", "Registry", "AI Insights"]
 
