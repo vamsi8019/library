@@ -319,8 +319,14 @@ def apply_styles(theme_mode: str) -> None:
 
         @media (min-width: 901px) {
             section[data-testid="stSidebar"] {
+                display: none !important;
+            }
+
+            section[data-testid="stSidebar"] {
                 min-width: 21rem !important;
                 width: 21rem !important;
+                padding-left: 0.85rem;
+                padding-right: 0.85rem;
                 max-width: 21rem !important;
                 flex: 0 0 21rem !important;
             }
